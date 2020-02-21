@@ -1,0 +1,5 @@
+---
+- name: Dynamic Roler
+  hosts: all
+  roles:
+  - dynamic_roler

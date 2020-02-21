@@ -1,0 +1,23 @@
+---
+- name: Write dynamic requirements.yaml
+  copy:
+    content: |
+      ---
+      roles:
+      {% for _role in _tmp_galaxy_roles %}
+      - name: {{ _role | dynamic_role_name | to_json }}
+        src: {{ _role.src | to_json }}
+      {%   if 'scm' in _role %}
+        scm: {{ _role.scm }}
+      {%   endif %}
+      {%   if 'version' in _role %}
+        version: {{ _role.version }}
+      {%   endif %}
+      {% endfor %}
+    dest: "{{ dynamic_roler_tmpdir }}/requirements.yaml"
+
+- name: Install ansible-galaxy sources
+  command: >-
+    ansible-galaxy install --no-deps
+    --role-file "{{ dynamic_roler_tmpdir }}/requirements.yaml"
+    --roles-path "{{ dynamic_roler_collection_role_path | default(dynamic_roler_tmpdir) }}"

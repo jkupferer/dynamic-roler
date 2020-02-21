@@ -1,0 +1,19 @@
+---
+- name: Create collections/ansible_collections path
+  file:
+    state: directory
+    path: "{{ playbook_dir }}/collections/ansible_collections"
+
+- name: Create dynamic_roler_tmpdir
+  tempfile:
+    state: directory
+    path: "{{ playbook_dir }}/collections/ansible_collections"
+    prefix: "dynamic_roler_"
+  register: r_dynamic_roler_tmpdir
+
+- name: Set dynamic_roler facts
+  set_fact:
+    dynamic_roler_tmpdir: "{{ r_dynamic_roler_tmpdir.path }}"
+    dynamic_roler_cleanup: "{{ dynamic_roler_cleanup | default(true) }}"
+    dynamic_roler_prefix: "{{ r_dynamic_roler_tmpdir.path | basename }}._."
+    dynamic_roler_collection_role_path: "{{ r_dynamic_roler_tmpdir.path }}/_/roles"

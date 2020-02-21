@@ -1,0 +1,22 @@
+---
+- name: Dynamic roler setup
+  run_once: true
+  include_tasks:
+    file: setup.yaml
+    apply:
+      delegate_to: localhost
+      run_once: true
+
+- name: Include dynamic roles
+  include_role:
+    name: "{{ dynamic_roler_prefix | default('') ~ _role.name }}"
+  loop: "{{ dynamic_roler_includes }}"
+  loop_control:
+    loop_var: _role
+    label: "{{ _role.name }}"
+
+- name: Remove dynamic_roler_tmpdir
+  file:
+    path: "{{ dynamic_roler_tmpdir }}"
+    state: absent
+  when: dynamic_roler_cleanup | default(false) | bool

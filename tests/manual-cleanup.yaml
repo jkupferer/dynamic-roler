@@ -1,0 +1,18 @@
+---
+- name: Dynamic Roler
+  hosts: localhost
+  vars:
+    dynamic_roler_sources:
+    - name: k8s_config
+      src: redhat-cop.k8s_config
+    dynamic_roler_cleanup: false
+  roles:
+  - dynamic_roler
+  tasks:
+  - name: Include k8s_config
+    include_role:
+      name: "{{ dynamic_roler_prefix }}k8s_config"
+  - name: Remove dynamic_roler_tmpdir
+    file:
+      path: "{{ dynamic_roler_tmpdir }}"
+      state: absent

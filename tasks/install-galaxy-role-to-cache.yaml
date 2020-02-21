@@ -1,0 +1,27 @@
+---
+- when: not _role_cache_path is exists
+  block:
+  - name: Write dynamic requirements.yaml
+    copy:
+      content: |
+        ---
+        roles:
+        - name: {{ _role_name_version | to_json }}
+          src: {{ _role.src | to_json }}
+          version: {{ _role.version | to_json }}
+        {% if 'scm' in _role %}
+          scm: {{ _role.scm }}
+        {% endif
+      dest: "{{ _requirements_yaml }}"
+  
+  - name: Install ansible-galaxy source for {{ _role_name }}
+    command: >-
+      ansible-galaxy install --no-deps
+      --role-file {{ _requirements_yaml | quote }}
+      --roles-path {{ dynamic_role_cache | quote }}
+
+- name: Create link to role cache for {{ _role_name }}
+  file:
+    state: link
+    path: "{{ _dynamic_roler_collection_role_path }}/{{ _role_name }}"
+    src: "{{ _role_cache_path | relpath(_dynamic_roler_collection_role_path) }}"

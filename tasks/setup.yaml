@@ -1,0 +1,29 @@
+---
+- name: Setup dynamic_roler_tmpdir
+  when: dynamic_roler_tmpdir is not defined
+  include_tasks: dynamic-roler-tmpdir.yaml
+
+- name: Install ansible-galaxy sources to temporary path
+  include_tasks: install-galaxy-roles-to-tmp.yaml
+  vars:
+    _galaxy_roles: >-
+      {{ dynamic_roler_sources | select('galaxy_source') | list }}
+    # If dynamic roles are cached then only install roles with volatile
+    # versions directly to temporary directory.
+    _tmp_galaxy_roles: >-
+      {{ _galaxy_roles | select('volatile_version') | list
+      if dynamic_roler_cache is defined else _galaxy_roles }}
+  when: _tmp_galaxy_roles != []
+
+- name: Install ansible-galaxy sources to cache
+  include_tasks: install-galaxy-role-to-cache.yaml
+  loop: "{{ dynamic_roler_sources | default([]) }}"
+  loop_control:
+    loop_var: _role
+    label: "{{ _role_name }}"
+  vars:
+    _role_name: "{{ _role | dynamic_role_name }}"
+    _role_name_version: "{{ _role_name ~ '-' ~ _role.version }}"
+    _requirements_yaml: "{{ _dynamic_roler_tmp }}/{{ _role_name | dynamic_role_name }}-requirements.yaml"
+    _role_cache_path: "{{ dynamic_roler_cache ~ '/' ~ _role_name_version }}"
+  when: _role is not volatile_version and dynamic_roler_cache is defined

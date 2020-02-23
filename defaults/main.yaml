@@ -12,6 +12,9 @@
 # created during setup.
 #dynamic_roler_cleanup: ...
 
+# Default omit
+#dynamic_roler_git_executable: ...
+
 # List of role sources as specified for requirements.yaml
 dynamic_roler_sources: []
 

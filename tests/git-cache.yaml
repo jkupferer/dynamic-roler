@@ -1,0 +1,33 @@
+---
+- name: Dynamic Roler
+  hosts: localhost
+  vars:
+    dynamic_roler_cache: "{{ playbook_dir }}/cache"
+    dynamic_roler_sources:
+    - name: k8s_config
+      git:
+        repo: https://github.com/redhat-cop/k8s_config.git
+    - name: tower_pip_packages
+      cache: true
+      git:
+        repo: https://github.com/redhat-cop/agnosticd.git
+        path: ansible/roles/tower-pip-packages
+        version: ocp4-workshop-rhpds-prod-1.17
+    - name: tower_user_create
+      cache: true
+      git:
+        repo: https://github.com/redhat-cop/agnosticd.git
+        path: ansible/roles/tower-user-create
+        version: ocp4-workshop-prod-1.41
+    - name: tower_project_create
+      cache: true
+      git:
+        repo: https://github.com/redhat-cop/agnosticd.git
+        path: ansible/roles/tower-project-create
+        version: ocp4-workshop-prod-1.41
+    dynamic_roler_includes:
+    - name: k8s_config
+    - name: tower_pip_packages
+    - name: tower_user_create
+  roles:
+  - dynamic_roler

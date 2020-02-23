@@ -1,0 +1,37 @@
+---
+# _role_name
+# _role_link_dir
+#    _role_link_dir: "{{ dynamic_roler_collection_role_path | default(dynamic_roler_tmpdir) }}"
+- name: Git clone for {{ _source.name }}
+  git:
+    dest: "{{ _git_repo_path }}"
+    # Pass-through options to git module
+    accept_hostkey: "{{ _source.git.accept_hostkey | default(omit) }}"
+    #archive - not appropriate for this usage
+    #bare - not appropriate for this usage
+    #clone - always default to yes
+    depth: "{{ _source.git.depth | default(omit) }}"
+    executable: "{{ dynamic_roler_git_executable | default(omit) }}"
+    force: "{{ _source.git.force | default(omit) }}"
+    gpg_whitelist: "{{ _source.git.gpg_whitelist | default(omit) }}"
+    key_file: "{{ _source.git.key_file | default(omit) }}"
+    recursive: "{{ _source.git.recursive | default(omit) }}"
+    rereference: "{{ _source.git.reference | default(omit) }}"
+    refspec: "{{ _source.git.refspec | default(omit) }}"
+    remote: "{{ _source.git.remote | default(omit) }}"
+    repo: "{{ _source.git.repo | default(omit) }}"
+    #separate_git_dir - not appropriate for this usage
+    ssh_opts: "{{ _source.git.ssh_opts | default(omit) }}"
+    track_submodules: "{{ _source.git.track_submodules | default(omit) }}"
+    umask: "{{ _source.git.umask | default(omit) }}"
+    update: "{{ _source.git.get('update', omit) }}"
+    verify_commit: "{{ _source.git.verify_commit | default(omit) }}"
+    version: "{{ _source.git.version | default(omit) }}"
+  when: not _git_repo_path is exists
+
+- name: Crete link to git repo for {{ _source.name }}
+  file:
+    state: link
+    path: "{{ _install_dir }}/{{ _source.name }}"
+    src: "{{ (_git_repo_path ~ '/' ~ _source.git.get('path', '')) | relpath(_install_dir) }}"
+      

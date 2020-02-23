@@ -1,0 +1,22 @@
+---
+- name: Dynamic Roler
+  hosts: localhost
+  vars:
+    dynamic_roler_sources:
+    - name: k8s_config
+      git:
+        repo: https://github.com/redhat-cop/k8s_config.git
+    - name: tower_pip_packages
+      git:
+        repo: https://github.com/redhat-cop/agnosticd.git
+        path: ansible/roles/tower-pip-packages
+    - name: tower_user_create
+      git:
+        repo: https://github.com/redhat-cop/agnosticd.git
+        path: ansible/roles/tower-user-create
+    dynamic_roler_includes:
+    - name: k8s_config
+    - name: tower_pip_packages
+    - name: tower_user_create
+  roles:
+  - dynamic_roler

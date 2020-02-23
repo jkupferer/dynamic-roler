@@ -21,14 +21,30 @@
 
 - name: Install ansible-galaxy sources to cache
   include_tasks: install-galaxy-role-to-cache.yaml
-  loop: "{{ dynamic_roler_sources | default([]) }}"
+  loop: >-
+    {{ dynamic_roler_sources | select('dynamic_roler_galaxy_source') | select('dynamic_roler_cache_enabled') | list
+    if dynamic_roler_cache is defined else [] }}
   loop_control:
     loop_var: _role
     label: "{{ _role_name }}"
   vars:
-    _role_name: "{{ _role | dynamic_role_name }}"
+    _role_name: "{{ _role | dynamic_roler_source_name }}"
     _role_name_version: "{{ _role_name ~ '-' ~ _role.version }}"
     _requirements_yaml: "{{ dynamic_roler_tmpdir }}/{{ _role_name }}-requirements.yaml"
     _role_cache_path: "{{ dynamic_roler_cache ~ '/' ~ _role_name_version }}"
     _role_link_dir: "{{ dynamic_roler_collection_role_path | default(dynamic_roler_tmpdir) }}"
-  when: dynamic_roler_cache is defined and not _role is dynamic_roler_cache_disabled
+
+- name: Install git sources
+  include_tasks: install-git-source.yaml
+  loop: "{{ dynamic_roler_sources | select('dynamic_roler_git_source') | list }}"
+  loop_control:
+    loop_var: _source
+    label: "{{ _source.name }}"
+  vars:
+    _install_dir: "{{ dynamic_roler_collection_role_path | default(dynamic_roler_tmpdir) }}"
+    _git_repo_path: >-
+      {%- if dynamic_roler_cache is defined and _source is dynamic_roler_cache_enabled -%}
+      {{ dynamic_roler_cache }}/{{ _source | dynamic_roler_git_source_repo_hash }}
+      {%- else -%}
+      {{ _install_dir }}/{{ _source | dynamic_roler_git_source_repo_hash }}
+      {%- endif -%}

@@ -1,5 +1,5 @@
 ---
-# If provided then non-volatile roles will be stored in dynamic_role_cache
+# Path to cache may be provided to save roles betwen runs.
 #dynamic_roler_cache: ...
 
 # If set then this path should also be in ANSIBLE_ROLES_PATH so that roles
@@ -7,8 +7,9 @@
 # to try to make the roles work through a dynamic collections structure.
 #dynamic_roler_tmpdir: ...
 
-# By default dynamic_roler_cleanup will be set to true if a temporary directory
-# is created.
+# Flag to indicate whether dynamic_roler_tmpdir should be removed. By default
+# dynamic_roler_cleanup will be set to true if a temporary directory is
+# created during setup.
 #dynamic_roler_cleanup: ...
 
 # List of role sources as specified for requirements.yaml

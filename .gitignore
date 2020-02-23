@@ -1,3 +1,5 @@
 collections
 *.retry
 __pycache__
+tests/cache
+*.swp

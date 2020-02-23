@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DIR="$(mktemp -d dynamic_roles_XXXXXXXX)"
+DIR="dynamic_roler_$$"
 
 echo $DIR
 

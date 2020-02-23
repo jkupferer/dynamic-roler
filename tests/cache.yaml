@@ -1,0 +1,13 @@
+---
+- name: Dynamic Roler
+  hosts: localhost
+  vars:
+    dynamic_roler_cache: "{{ playbook_dir }}/cache"
+    dynamic_roler_sources:
+    - name: k8s_config
+      src: redhat-cop.k8s_config
+      version: 0.2.0
+    dynamic_roler_includes:
+    - name: k8s_config
+  roles:
+  - dynamic_roler

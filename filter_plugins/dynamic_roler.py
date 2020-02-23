@@ -19,6 +19,8 @@ def dynamic_role_name(role):
     m = re.search(r'/(\w+)(\.git)?$', role['src'])
     if m:
         return m.group(1)
+    elif re.match('(\w+)\.(\w+)$', roule['src']):
+        return role['src']
     raise AnsibleFilterError("Unable to determine role name from {}, name must be provided".format(role['src']))
 
 # ---- Ansible filters ----

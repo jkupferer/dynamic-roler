@@ -17,3 +17,8 @@
     dynamic_roler_cleanup: "{{ dynamic_roler_cleanup | default(true) }}"
     dynamic_roler_prefix: "{{ r_dynamic_roler_tmpdir.path | basename }}._."
     dynamic_roler_collection_role_path: "{{ r_dynamic_roler_tmpdir.path }}/_/roles"
+
+- name: Create dynamic_roler_collection_role_path
+  file:
+    state: directory
+    path: "{{ dynamic_roler_collection_role_path }}"

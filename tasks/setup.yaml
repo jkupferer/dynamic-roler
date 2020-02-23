@@ -1,4 +1,10 @@
 ---
+- name: Check/create dynamic_roler_tmpdir
+  file:
+    path: "{{ dynamic_roler_tmpdir }}"
+    state: directory
+  when: dynamic_roler_tmpdir is defined
+
 - name: Setup dynamic_roler_tmpdir
   when: dynamic_roler_tmpdir is not defined
   include_tasks: dynamic-roler-tmpdir.yaml
@@ -7,11 +13,9 @@
   include_tasks: install-galaxy-roles-to-tmp.yaml
   vars:
     _galaxy_roles: >-
-      {{ dynamic_roler_sources | select('galaxy_source') | list }}
-    # If dynamic roles are cached then only install roles with volatile
-    # versions directly to temporary directory.
+      {{ dynamic_roler_sources | select('dynamic_roler_galaxy_source') | list }}
     _tmp_galaxy_roles: >-
-      {{ _galaxy_roles | select('volatile_version') | list
+      {{ _galaxy_roles | select('dynamic_roler_cache_disabled') | list
       if dynamic_roler_cache is defined else _galaxy_roles }}
   when: _tmp_galaxy_roles != []
 
@@ -24,6 +28,7 @@
   vars:
     _role_name: "{{ _role | dynamic_role_name }}"
     _role_name_version: "{{ _role_name ~ '-' ~ _role.version }}"
-    _requirements_yaml: "{{ _dynamic_roler_tmp }}/{{ _role_name | dynamic_role_name }}-requirements.yaml"
+    _requirements_yaml: "{{ dynamic_roler_tmpdir }}/{{ _role_name }}-requirements.yaml"
     _role_cache_path: "{{ dynamic_roler_cache ~ '/' ~ _role_name_version }}"
-  when: _role is not volatile_version and dynamic_roler_cache is defined
+    _role_link_dir: "{{ dynamic_roler_collection_role_path | default(dynamic_roler_tmpdir) }}"
+  when: dynamic_roler_cache is defined and not _role is dynamic_roler_cache_disabled

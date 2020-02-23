@@ -1,0 +1,67 @@
+:toc:
+:toc-placement!:
+
+= dynamic_roler
+
+Ansible for dynamic role management and execution
+
+toc::[]
+
+== Overview
+
+`dynamic_roler` provides the capability to install at execute Ansible roles at runtime, configured through Ansible variables.
+
+Normal Ansible role uses requires that Ansible role sources be configured prior to playbook execution.
+This is usually managed by creating a `roles/requirements.yml` file within the code repository.
+Sometimes, however, the version of ansible roles needs to be handled dynamically at runtime with role sources configured through Ansible variables.
+The `dynamic_roler` accomplishes this by allowing requirements to be expressed in variables.
+
+== Requirements
+
+Ansible 2.9+
+
+== Usage
+
+Dynamic roler can be used either to fully automate Ansible roles sources and execution or used only for sources.
+
+=== Full Automation
+
+In the fully automated fashion dynamic_roler is responsible for role sourcing and execution.
+It achieves this by dynamically creating a temporary ansible collection structure in directory of the calling playbook.
+Roles sources are downloaded into the temporary collection roles directory and excuted from there as part of the dynamic collection.
+
+Example Playbook:
+
+--------------------------------------------------------------------------------
+- name: Dynamic Roler
+  hosts: localhost
+  vars:
+    dynamic_roler_sources:
+    - name: k8s_config
+      src: redhat-cop.k8s_config
+    dynamic_roler_includes:
+    - name: k8s_config
+  roles:
+  - dynamic_roler
+--------------------------------------------------------------------------------
+
+The advantage of this mode is that no special preparation is required to use the dynamic roler.
+There are, however, a few restrictions:
+
+* Ansible must be able to create files in subdirectory `collections/ansible_collections/` under the playbook directory.
+
+* Role names may not include `.`.
+Ansible Galaxy sources must have the namespace stripped off by giving a short `name` in the `dynamic_roler_sources`.
+
+* Dynamic may be referenced after execution of `dynamic_roler` only if `dynamic_roler_cleanup` is set to `false` and
+role names are prefixed with `dynamic_roler_prefix`.
+
+=== Pre-Configured Temporary Directory
+
+A temporary directory may be given for use by dynamic_roler with `dynamic_roler_tmpdir`.
+This directory must be configured in `ANSIBLE_ROLES_PATH`.
+
+The advantage of using a pre-configured temporary directory is that after dynamic_roler processing dynamic roles may be used as normal.
+This makes dynamic_roler compatible for use with any existing ansible roles or playbooks.
+
+The temporary directory should be cleaned up after ansible use and not shared between concurrent ansible playbooks.
